@@ -603,11 +603,12 @@ export function createPatchFunction (backend) {
       vnode.isAsyncPlaceholder = true
       return true
     }
-    // assert node match
-    if (process.env.NODE_ENV !== 'production') {
-      if (!assertNodeMatch(elm, vnode, inVPre)) {
-        return false
+    // assert node match - always to avoid stale applications (full re-render is not nice, but not working production code is worse)
+    if (!assertNodeMatch(elm, vnode, inVPre)) {
+      if (typeof console !== 'undefined') {
+        console.warn('assertNodeMatch failed'); // very short but a hint
       }
+      return false
     }
     if (isDef(data)) {
       if (isDef(i = data.hook) && isDef(i = i.init)) i(vnode, true /* hydrating */)
